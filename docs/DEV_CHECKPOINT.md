@@ -1,0 +1,13 @@
+# Development checkpoint - 23 October 2026
+
+- Working branch: `dev`; release baseline on `main`: 59f40aafc10480fb5132a42c7529da551b93361b. No new main commit, release tag or production release created.
+- Dedicated lab built using `compose.dev.yaml`; both empty synthetic station databases migrated and completed the integrated rehearsal. Owner summary across both services returned HTTP 200.
+- Full development regression suite: **166 tests passed in 32.042 seconds**. Separate release-manifest validation: **5 tests passed**. Django checks and migration consistency passed.
+- Lab mounts verified: only `pump_dev_dev_station1` and `pump_dev_dev_station2` data volumes. Private `.env.dev` is ignored by Git and excluded from image build context. No local station/recovery volumes are used by the lab. Existing local station image remains a separate image from the development build.
+- GitHub main protection enabled for PRs and checks `verify`, `synthetic-lab (station1)` and `synthetic-lab (station2)`, with administrator enforcement, no force push/delete and conversation resolution. No independent approving review is required by GitHub on this single-owner repository; owner release acceptance remains an explicit process gate.
+- Active ruleset `Immutable release tags` prevents update/deletion of future `refs/tags/v*`; no release tag exists.
+- Initial VM SSH and Docker preflight passed through the owner's administrative network. VM resources were inspected only. No application was installed there. This does not establish security, public HTTPS, load capacity, backup durability or production readiness.
+
+New code includes fail-closed synthetic seeding, production refusal of demo commands, isolated lab automation, shared Indian business-clock boundaries and release-manifest validation. Automatic business-date changes and audited shift submissions remain future application work.
+
+Still required: hosted CI results, exact stricter recovery targets, domain/DNS and backup/standby budget; audited shift/cash workflows; ten-user contention tests; actual production configuration, fresh-host recovery and owner UAT. All production gates remain unpassed until the corresponding evidence is recorded.

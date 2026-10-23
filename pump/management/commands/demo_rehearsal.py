@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.utils import timezone
 from pump.models import Shift,Tank,Salesperson,ManagerProfile,Debtor,LubeProduct,MoneyAccount,TankQualityObservation,StaffAccess,Reading
 from pump.services import save_shift,save_credit_sale,save_expense,save_lube_sale,save_handover,save_debtor_payment
@@ -27,6 +28,8 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        if settings.PUMP_ENVIRONMENT == 'production':
+            raise CommandError('Demo rehearsal is forbidden in production.')
         if not options['confirm_demo']:
             raise CommandError('Pass --confirm-demo only for an empty demonstration station.')
         if Tank.objects.exists() or Shift.objects.exists() or MoneyAccount.objects.exists():

@@ -1,0 +1,42 @@
+# Standalone lab, not an override of the local station Compose file.
+name: pump_dev
+x-dev-env: &dev-env
+  PUMP_ENVIRONMENT: development
+  PUMP_ALLOW_SYNTHETIC_DATA: "1"
+  PUMP_SECRET_KEY: ${PUMP_DEV_SECRET_KEY:?Set a dedicated development signing key}
+  PUMP_DEV_OWNER_PASSWORD: ${PUMP_DEV_OWNER_PASSWORD:-}
+  PUMP_DB_PATH: /data/synthetic.sqlite3
+  PORTAL_URL: http://127.0.0.1:8015
+  STATION_LINKS: '[{"code":"station1","name":"SYNTHETIC Hamara Pump","url":"http://127.0.0.1:8015/"},{"code":"station2","name":"SYNTHETIC Govind Pump","url":"http://127.0.0.1:8015/station2/"}]'
+services:
+  web:
+    build: .
+    image: pump-dev-lab:local
+    environment:
+      <<: *dev-env
+      STATION_CODE: station1
+      STATION_NAME: SYNTHETIC Hamara Pump
+      OWNER_SUMMARY_PEER_URL: http://station2:8000/owner-summary/
+    volumes:
+      - dev_station1:/data
+  station2:
+    image: pump-dev-lab:local
+    environment:
+      <<: *dev-env
+      STATION_CODE: station2
+      STATION_NAME: SYNTHETIC Govind Pump
+      OWNER_SUMMARY_PEER_URL: http://web:8000/owner-summary/
+    volumes:
+      - dev_station2:/data
+  portal:
+    image: nginx:stable-alpine
+    ports:
+      - "127.0.0.1:8015:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+      - station2
+volumes:
+  dev_station1:
+  dev_station2:

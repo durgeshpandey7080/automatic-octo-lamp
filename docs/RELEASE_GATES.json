@@ -1,0 +1,74 @@
+{
+  "updated": "2026-10-23",
+  "productionReady": false,
+  "developmentBranch": "dev",
+  "releaseBranch": "main",
+  "baselineCommit": "59f40aafc10480fb5132a42c7529da551b93361b",
+  "candidateCommit": null,
+  "releaseTag": null,
+  "imageDigest": null,
+  "expectedConcurrentUsers": 5,
+  "requiredConcurrentTestUsers": 10,
+  "recovery": {
+    "rpo": null,
+    "rto": null,
+    "status": "owner_requires_stricter_targets"
+  },
+  "gates": [
+    {
+      "id": "G0",
+      "status": "in_progress",
+      "evidence": [
+        "docs/DEV_CHECKPOINT.md: main PR/check protection and immutable version-tag rules verified.",
+        "166 local Django tests, 5 release-manifest tests and both-station synthetic rehearsals passed."
+      ],
+      "remaining": "Verify hosted CI for the current dev commit; no release tag exists."
+    },
+    {
+      "id": "G1",
+      "status": "in_progress",
+      "evidence": [
+        "Baseline: 155 local tests at the dashboard checkpoint."
+      ],
+      "remaining": "Implement and test shift submission, physical cash, custody, disputes and reconciled deposits."
+    },
+    {
+      "id": "G2",
+      "status": "not_passed",
+      "evidence": [],
+      "remaining": "Database decision, migration rehearsal and ten-user contention/fault tests."
+    },
+    {
+      "id": "G3",
+      "status": "not_passed",
+      "evidence": [],
+      "remaining": "Public production hardening, actual deployment settings and authentication/access testing."
+    },
+    {
+      "id": "G4",
+      "status": "blocked",
+      "evidence": [],
+      "remaining": "Agree stricter RPO/RTO and prove a fresh-host/off-VM restore."
+    },
+    {
+      "id": "G5",
+      "status": "not_passed",
+      "evidence": [],
+      "remaining": "Owner/manager acceptance of the complete synthetic workflow."
+    },
+    {
+      "id": "G6",
+      "status": "not_passed",
+      "evidence": [],
+      "remaining": "Review exact candidate, release manifest, migration/rollback evidence and owner acceptance."
+    },
+    {
+      "id": "G7",
+      "status": "blocked",
+      "evidence": [
+        "Initial read-only SSH, resource and Docker preflight passed; no VM deployment performed."
+      ],
+      "remaining": "Domain/TLS, production configuration, staging and restore drill, approved openings and cutover acceptance remain pending."
+    }
+  ]
+}

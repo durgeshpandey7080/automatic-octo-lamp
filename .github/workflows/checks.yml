@@ -20,3 +20,26 @@ jobs:
       - run: python manage.py check
       - run: python manage.py makemigrations --check --dry-run
       - run: python manage.py test --noinput
+      - run: python -m unittest discover -s scripts -p 'test_*.py'
+      - run: node docs/project-report-site/build.mjs
+      - run: node --check pump/static/pump/owner.js
+
+  synthetic-lab:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        station: [station1, station2]
+    env:
+      PUMP_ENVIRONMENT: development
+      PUMP_ALLOW_SYNTHETIC_DATA: '1'
+      PUMP_DB_PATH: /tmp/synthetic.sqlite3
+      STATION_CODE: ${{ matrix.station }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python manage.py migrate --noinput
+      - run: python manage.py synthetic_lab --confirm-synthetic

@@ -1,5 +1,7 @@
 from pathlib import Path
 import os
+PUMP_ENVIRONMENT = os.environ.get('PUMP_ENVIRONMENT', 'local')
+ALLOW_SYNTHETIC_DATA = os.environ.get('PUMP_ALLOW_SYNTHETIC_DATA', '') == '1'
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Local learning project only. Replace this and harden settings before deployment.
 SECRET_KEY = os.environ.get('PUMP_SECRET_KEY', 'local-learning-only-hpcl-pump-do-not-deploy')

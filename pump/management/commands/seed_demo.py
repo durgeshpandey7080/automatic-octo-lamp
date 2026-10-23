@@ -1,10 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.conf import settings
 from pump.models import Tank, Nozzle, Shift
 class Command(BaseCommand):
     help = 'Create demo tanks and nozzles only in an empty installation.'
     @transaction.atomic
     def handle(self, *args, **options):
+        if settings.PUMP_ENVIRONMENT == 'production':
+            raise CommandError('Demo configuration is forbidden in production.')
         if Tank.objects.exists() or Nozzle.objects.exists() or Shift.objects.exists():
             raise CommandError('Database is not empty; existing configuration was left unchanged.')
         petrol = Tank.objects.create(name='DEMO Petrol Tank', fuel='PETROL', capacity_litres=20000)

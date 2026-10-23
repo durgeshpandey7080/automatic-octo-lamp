@@ -1,7 +1,7 @@
 window.REPORT = {
   "title": "Pandey Petrol Pump — Project Report",
   "snapshotDate": "23 Oct 2026",
-  "tests": 155,
+  "tests": 166,
   "triggersPerStation": 96,
   "migration": "0033",
   "verification": [
@@ -19,7 +19,8 @@ window.REPORT = {
     "Shortage receipt before/after payroll, waiver limits, retries, correction limits, cash/bank posting and closed dates",
     "Combined owner summary: both service directions, owner-only access, expiring signed requests, date/settlement cutoffs, missing-service handling and no ledger writes",
     "Local AI: allowed check IDs only, no free-form factual claims, owner-only access, no cloud fallback, isolated container, timeout/concurrency, input minimisation and escaped output",
-    "Owner phone redesign: matching-shift weekly comparisons, missing/zero baselines, sparse stock history, configurable thresholds, dip freshness, reading grace deadlines and login routing"
+    "Owner phone redesign: matching-shift weekly comparisons, missing/zero baselines, sparse stock history, configurable thresholds, dip freshness, reading grace deadlines and login routing",
+    "Dev-only isolation: both synthetic stations reconciled; 166 Django regressions and 5 release-manifest checks passed; main/tag protections configured"
   ],
   "roadmap": [
     {
@@ -255,6 +256,12 @@ window.REPORT = {
       "icon": "+",
       "title": "Sales-first dashboard for the owner phone",
       "body": "Phone-first layout, matching-shift same-weekday comparisons, dated dips, per-tank warnings and recorded cash. 155 tests pass. Both station databases migrated to 0033 with all original records unchanged. Custody and shift-submission extensions remain planned."
+    },
+    {
+      "phase": "23 OCT 2026 - CONTROLLED DEVELOPMENT",
+      "icon": "+",
+      "title": "Dev branch, synthetic lab and production gates",
+      "body": "New work stays on dev. Isolated two-station rehearsal passes; main requires PR/checks and version tags cannot be moved/deleted. Production gates cover shift/cash workflows, ten-user contention, public HTTPS, recovery and release reproducibility. Initial VM read-only preflight passed; no deployment or production release."
     }
   ],
   "setup": [
@@ -267,6 +274,11 @@ window.REPORT = {
     "Pilot one station against existing registers before relying on the software."
   ],
   "next": [
+    "Implement audited shift submission/correction and physical cash counts.",
+    "Implement per-pump custody, acknowledgements and owner resolution of disputes.",
+    "Agree stricter recovery targets, domain and backup/standby budget.",
+    "Prove database correctness at ten concurrent users and complete public-HTTPS hardening.",
+    "Run staging UAT and fresh-host restore, then review main promotion and release artifact.",
     "Add employee payment acknowledgement and reviewed salary refunds.",
     "Verify your actual provider export formats and add native report adapters.",
     "Add bank-statement matching, refunds and settlement-batch allocation.",

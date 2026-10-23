@@ -2,6 +2,8 @@
 
 Repository: https://github.com/durgeshpandey7080/automatic-octo-lamp
 
+**Development now happens on `dev`.** `main` is the frozen local-prototype checkpoint until reviewed release gates pass. See the [production roadmap](docs/ROADMAP.md), [gate register](docs/RELEASE_GATES.json), [synthetic test matrix](docs/TEST_MATRIX.md) and [isolated development lab](docs/DEVELOPMENT.md). The future public-HTTPS production VM will use a reviewed release tag and recorded image digest; no production release has been created.
+
 This is the source checkpoint imported on **23 October 2026**, including two-station operation, owner dashboard, reconciliation, payroll/advances, shortage recovery, local AI and the optional English/Hindi interface. Feature-specific limitations remain in the process documents below.
 
 **Start here:** [repository import and isolated verification](docs/REPOSITORY_IMPORT.md). The original setup scripts below target the existing `hpcl_pump` installation; read the import notes before running them from a second checkout. Private business data and credentials are not in this repository.

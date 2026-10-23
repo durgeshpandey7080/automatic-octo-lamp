@@ -1,9 +1,10 @@
 """Read-only dashboard calculations. Saved readings are not shift approvals."""
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.utils import timezone
 from . import models as m
+from .business_clock import shift_deadline
 
 ZERO = Decimal('0')
 
@@ -69,7 +70,7 @@ def decorate(summary, day, now=None):
                            matched_slots=[s['number'] for s in ready],
                            checked=datetime.fromisoformat(summary['checked_at']))
     for slot in slots:
-        due = timezone.make_aware(datetime.combine(day, time(10 if slot['number'] == 1 else 22, 30)))
+        due = shift_deadline(day, slot['number'])
         slot['overdue'] = slot['count'] < 8 and now > due
         slot['ready'] = slot['count'] == 8 and slot['priced']
     for tank in summary['stocks']:
