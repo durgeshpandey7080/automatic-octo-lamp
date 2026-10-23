@@ -277,7 +277,7 @@ window.REPORT = {
   "next": [
     "Implement audited shift submission/correction and physical cash counts.",
     "Implement per-pump custody, acknowledgements and owner resolution of disputes.",
-    "Planning defaults adopted: RPO \u003c=1 minute, RTO \u003c=30 minutes, \u003c= INR 2,000/month initial off-VM backup/monitoring allowance, Cloudflare DNS on an owner-controlled domain, and paper fallback; prove recovery and obtain provider quotes.",
+    "Planning defaults adopted: RPO \u003c=1 minute, RTO \u003c=30 minutes, \u003c= INR 2,000/month initial backup/monitoring allowance, owner plans to buy a domain, authenticator MFA, owner-reset individual staff accounts, and paper fallback. Retention and paper form details wait for the pilot; recovery evidence and provider quotes remain open.",
     "Prove database correctness at ten concurrent users and complete public-HTTPS hardening.",
     "Run staging UAT and fresh-host restore, then review main promotion and release artifact.",
     "Add employee payment acknowledgement and reviewed salary refunds.",

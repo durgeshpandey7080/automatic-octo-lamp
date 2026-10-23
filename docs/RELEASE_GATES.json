@@ -19,7 +19,12 @@
     "allowanceStatus": "planning_cap_pending_provider_quotes",
     "dnsRecommendation": "Cloudflare DNS for an owner-controlled domain",
     "domain": null,
+    "domainStatus": "owner plans to buy; defer purchase until public staging hostname is needed",
+    "ownerMfa": "authenticator app with saved recovery codes",
+    "staffAccountRecovery": "individual accounts; owner verifies identity and resets access",
+    "backupRetention": "deferred until pilot",
     "paperFallback": "Use shift paper records during outages; enter and reconcile after recovery with outage time and owner review.",
+    "paperFormDetail": "deferred until pilot",
     "offlineAppSync": "deferred"
   },
   "gates": [
@@ -77,7 +82,7 @@
       "evidence": [
         "Initial read-only SSH, resource and Docker preflight passed; no VM deployment performed."
       ],
-      "remaining": "Owner-controlled domain/DNS selection, TLS, production configuration, staging and restore drill, approved openings and cutover acceptance remain pending."
+      "remaining": "Purchase/select domain and DNS, implement MFA and owner-managed staff resets, verify TLS, production configuration, staging and restore drill, approve openings and cutover acceptance."
     }
   ],
   "validatedCodeCommit": "78bfa27fd56b6ea0f383cd6188b7f5a980d02da4"

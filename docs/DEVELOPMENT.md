@@ -30,7 +30,7 @@ Production will start with approved real opening balances; the owner confirmed a
 
 VM access will be supplied later. Until then, infrastructure validation and production deployment are pending; passing local containers is not evidence that the future VM meets the gates.
 
-Current planning defaults are RPO at most 1 minute and RTO at most 30 minutes, with an initial allowance of ₹2,000/month for off-VM backups and monitoring. Use Cloudflare DNS for an owner-controlled domain unless the owner selects another provider. During outages, staff use the shift paper record and reconcile it after recovery with owner review; full offline sync is deferred. These are planning choices, not proof that the VM or a provider can meet the recovery targets. Confirm quotes and select the domain before configuring public HTTPS.
+Current planning defaults are RPO at most 1 minute and RTO at most 30 minutes, with an initial allowance of ₹2,000/month for off-VM backups and monitoring. The owner plans to buy a domain; use Cloudflare DNS as the recommended default when public staging needs a hostname. Owner MFA will use an authenticator app and saved recovery codes. Staff use individual accounts, with access reset by the owner after identity verification. During outages, staff use shift paper records and reconcile after recovery with owner review; exact paper-form fields and backup retention are deferred until the pilot, and full offline sync is deferred. These are planning choices, not proof that the VM or a provider can meet the recovery targets. Confirm quotes and buy/select the domain before configuring public HTTPS.
 
 ## Release manifest preflight
 
