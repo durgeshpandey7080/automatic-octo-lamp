@@ -10,7 +10,7 @@
 
 New code includes fail-closed synthetic seeding, production refusal of demo commands, isolated lab automation, shared Indian business-clock boundaries and release-manifest validation. Automatic business-date changes and audited shift submissions remain future application work.
 
-Still required: exact stricter recovery targets, domain/DNS and backup/standby budget; audited shift/cash workflows; ten-user contention tests; actual production configuration, fresh-host recovery and owner UAT. Only G0 has passed; G1 through G7 remain unpassed until their evidence is recorded.
+Planning defaults now adopted: RPO at most 1 minute, RTO at most 30 minutes, a ₹2,000/month initial off-VM backup/monitoring allowance, Cloudflare DNS on an owner-controlled domain, and paper shift records during outages with later owner-reviewed reconciliation. These do not pass the recovery or cutover gates; provider quotes, domain selection, and successful restore evidence remain outstanding. Audited shift/cash workflows, ten-user contention tests, actual production configuration, fresh-host recovery and owner UAT are also required. Only G0 has passed; G1 through G7 remain unpassed until their evidence is recorded.
 
 Hosted CI first exposed a hardcoded restore UID assumption. Recovery now preserves the installed database owner and permissions; required ownership-change errors still fail recovery. The complete 168-test suite passes, and 9 backup/ownership tests also pass as UID/GID 1001. CI uses Ubuntu 24.04 and verified, pinned v6 action commits. Hosted CI passed all three jobs for code checkpoint 78bfa27; G0 is complete for this checkpoint.
 

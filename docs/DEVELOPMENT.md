@@ -30,6 +30,8 @@ Production will start with approved real opening balances; the owner confirmed a
 
 VM access will be supplied later. Until then, infrastructure validation and production deployment are pending; passing local containers is not evidence that the future VM meets the gates.
 
+Current planning defaults are RPO at most 1 minute and RTO at most 30 minutes, with an initial allowance of ₹2,000/month for off-VM backups and monitoring. Use Cloudflare DNS for an owner-controlled domain unless the owner selects another provider. During outages, staff use the shift paper record and reconcile it after recovery with owner review; full offline sync is deferred. These are planning choices, not proof that the VM or a provider can meet the recovery targets. Confirm quotes and select the domain before configuring public HTTPS.
+
 ## Release manifest preflight
 
 `python scripts/check_release.py` intentionally fails for the current gate register. Before a production release, prepare a separate accepted manifest for the exact candidate commit and run `python scripts/check_release.py --manifest PATH`. A separate manifest avoids the impossible cycle of committing a file containing its own commit hash. Store the accepted manifest with release artifacts. The script checks required gate evidence references, owner acceptance, version, digest and recovery targets; it does not authenticate external evidence or make an unsafe deployment safe. It never creates a tag or deploys.

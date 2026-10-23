@@ -10,9 +10,17 @@
   "expectedConcurrentUsers": 5,
   "requiredConcurrentTestUsers": 10,
   "recovery": {
-    "rpo": null,
-    "rto": null,
-    "status": "owner_requires_stricter_targets"
+    "rpo": "<=1 minute acknowledged-data loss",
+    "rto": "<=30 minutes service restoration",
+    "status": "planning_targets_adopted_evidence_pending"
+  },
+  "infrastructurePlanning": {
+    "monthlyAllowanceINR": 2000,
+    "allowanceStatus": "planning_cap_pending_provider_quotes",
+    "dnsRecommendation": "Cloudflare DNS for an owner-controlled domain",
+    "domain": null,
+    "paperFallback": "Use shift paper records during outages; enter and reconcile after recovery with outage time and owner review.",
+    "offlineAppSync": "deferred"
   },
   "gates": [
     {
@@ -49,7 +57,7 @@
       "id": "G4",
       "status": "blocked",
       "evidence": [],
-      "remaining": "Agree stricter RPO/RTO and prove a fresh-host/off-VM restore."
+      "remaining": "Design and prove the adopted RPO <=1 minute and RTO <=30 minute targets with encrypted off-VM recovery, keys and a timed fresh-host restore; confirm costs from provider quotes."
     },
     {
       "id": "G5",
@@ -69,7 +77,7 @@
       "evidence": [
         "Initial read-only SSH, resource and Docker preflight passed; no VM deployment performed."
       ],
-      "remaining": "Domain/TLS, production configuration, staging and restore drill, approved openings and cutover acceptance remain pending."
+      "remaining": "Owner-controlled domain/DNS selection, TLS, production configuration, staging and restore drill, approved openings and cutover acceptance remain pending."
     }
   ],
   "validatedCodeCommit": "78bfa27fd56b6ea0f383cd6188b7f5a980d02da4"
