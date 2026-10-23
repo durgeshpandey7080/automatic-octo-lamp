@@ -1,0 +1,7 @@
+# Temporary Internet connection for downloading model weights only.
+# Remove this override after pull: compose -p hpcl_pump -f compose.yaml up -d ollama
+services:
+  ollama:
+    networks:
+      default: {}
+      ai_private: {}

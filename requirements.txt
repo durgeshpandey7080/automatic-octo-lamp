@@ -1,0 +1,2 @@
+Django==5.2.18
+cryptography==50.0.2

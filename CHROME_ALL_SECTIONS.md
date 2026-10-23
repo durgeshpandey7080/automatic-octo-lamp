@@ -1,0 +1,15 @@
+# Every-section Chrome demo - 19 October 2026
+
+Both Hamara Pump Narai and Shree Govind KSK have a fresh two-shift DEMO day. All 50 pump models now contain records in each station, including retained tank/nozzle configuration. This is record coverage, not proof of every possible circumstance.
+
+Chrome entries: employee and manager profiles; two shifts and duty; opening stock in both tanks; two deliveries; morning and after-delivery quality observations; returned testing fuel; lube product/opening/purchase/sale; customer opening credit, credit sale and partial repayment; expense voucher; Paytm, PhonePe and card collections; cash float/return; supplier purchase/freight, partial payment and credit note; bank settlement; cash/bank opening accounts, internal deposit and bank assignments; sales receipt; bulk allocation; discount; shortage, salary and audited deduction correction; disabled station role; closing submission, review and close.
+
+Browser checks: invalid meters and excessive discounts rejected in both stations; duplicate salary rejected in Shree Govind KSK; closed-date expense rejected in both; ageing, workbench, reports, setup readiness, backup request/status and organisation switch reviewed. End-of-day close used explicit owner-only DEMO exceptions for the retained INR 100 shortage and unverified quality corrections. Warnings were not erased. Passwordless demo account was prepared by a local service command; its station access was disabled through Chrome.
+
+CSV upload: Chrome extension blocked local file selection because Allow access to file URLs is disabled. No browser permission was changed. Synthetic Paytm CSV was imported/matched through the tested application service instead, then evidence was inspected in Chrome in both stations. Browser upload itself remains unverified. All other listed business entries were made through Chrome screens.
+
+Verified per station: gross INR 15,700 including INR 100 other income, discount INR 100, net INR 15,600; cash submitted INR 15,350; shortage INR 100; cash-book balance INR 15,900; bank balance INR 99,198; debtor outstanding INR 250; supplier outstanding INR 39,050; lube stock 13 bottles; tank stock petrol 10,421L and diesel 10,420L; salary due after adjustment INR 11,960. Both databases passed integrity and foreign-key checks. Exactly one salary deduction and one adjustment each. Full automated suite: 112 tests passed.
+
+Two digital collection records per station (PhonePe and card) intentionally remain without bank settlement matches, illustrating pending reconciliation. Actual physical quality/capacity/stock are not certified. No actual wage, refund or bank transfer was performed. Tax remains disabled; shift discounts enabled. Both days are closed; further same-date edits require owner reopening with a reason.
+
+Read-only pages do not need fake financial records of their own. Admin tank/nozzle configuration is retained rather than inventing new hardware. Backup restore is tested on temporary copies, never by overwriting the live demo during this Chrome run.

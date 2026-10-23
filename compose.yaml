@@ -1,0 +1,103 @@
+x-station-env: &station-env
+  PUMP_SECRET_KEY: ${PUMP_SECRET_KEY:?Run setup-local.ps1 first to create the local signing key}
+  LOCAL_AI_URL: http://ollama:11434/api/chat
+  LOCAL_AI_MODEL: qwen3:1.7b
+  STATION_LINKS: '[{"code":"station1","name":"Hamara Pump Narai","url":"http://192.168.1.27:8000/"},{"code":"station2","name":"Shree Govind KSK","url":"http://192.168.1.27:8000/station2/"}]'
+services:
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    image: hpcl_pump-ollama-cpu
+    restart: unless-stopped
+    mem_limit: 4g
+    cpus: 2.0
+    environment:
+      OLLAMA_NO_CLOUD: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_MAX_QUEUE: "2"
+      OLLAMA_CONTEXT_LENGTH: "4096"
+      OLLAMA_KEEP_ALIVE: "0"
+    volumes:
+      - local_ai_models:/root/.ollama
+    networks:
+      - ai_private
+  portal:
+    restart: unless-stopped
+    image: nginx:stable-alpine
+    ports:
+      - "0.0.0.0:8000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      web:
+        condition: service_started
+        restart: true
+      station2:
+        condition: service_started
+        restart: true
+  web:
+    restart: unless-stopped
+    build: .
+    image: hpcl_pump-web
+    environment:
+      <<: *station-env
+      PUMP_DB_PATH: /data/db.sqlite3
+      STATION_NAME: Hamara Pump Narai
+      STATION_CODE: station1
+      OWNER_SUMMARY_PEER_URL: http://station2:8000/owner-summary/
+    networks:
+      - default
+      - ai_private
+    volumes:
+      - pump_data:/data
+      - ../pump-backups:/backups:ro
+      - backup_requests:/backup-requests
+    init: true
+  station2:
+    restart: unless-stopped
+    image: hpcl_pump-web
+    environment:
+      <<: *station-env
+      PUMP_DB_PATH: /data/db.sqlite3
+      STATION_NAME: Shree Govind KSK
+      STATION_CODE: station2
+      OWNER_SUMMARY_PEER_URL: http://web:8000/owner-summary/
+    networks:
+      - default
+      - ai_private
+    volumes:
+      - station2_data:/data
+      - ../pump-backups:/backups:ro
+      - backup_requests:/backup-requests
+    init: true
+  backup:
+    image: hpcl_pump-web
+    command: ["python", "backup_runner.py", "daemon"]
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+    volumes:
+      - pump_data:/sources/station1:ro
+      - station2_data:/sources/station2:ro
+      - .:/project:ro
+      - ../pump-backups:/backups
+      - ../pump-backups-secondary:/secondary
+      - ../pump-recovery:/recovery:ro
+      - backup_requests:/requests
+    depends_on:
+      - web
+      - station2
+networks:
+  ai_private:
+    internal: true
+volumes:
+  local_ai_models:
+  pump_data:
+  station2_data:
+  backup_requests:
+    external: true
+    name: hpcl_pump_backup_requests

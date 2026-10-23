@@ -1,0 +1,5 @@
+{% extends "admin/base.html" %}{% load i18n interface %}
+{% block title %}{{ title|ui }} | {{ station_name }} | {{ software_name }}{% endblock %}
+{% block branding %}<div id="site-name"><a href="{% url 'admin:index' %}">{{ software_name }}</a></div><div style="font-size:14px;margin:8px 0">{% translate "Station:" %} <strong>{{ station_name }}</strong></div>{% endblock %}
+{% block extrastyle %}{{ block.super }}{% load static %}<link rel="stylesheet" href="{% static 'pump/switcher.css' %}?v=1">{% endblock %}
+{% block nav-global %}{% if user.is_authenticated %}{% include 'pump/organisation_switcher.html' %}{% endif %}<a href="http://127.0.0.1:8000/organisations/" style="padding:16px">{% translate "Switch organisation" %}</a>{% endblock %}

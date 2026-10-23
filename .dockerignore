@@ -1,0 +1,16 @@
+.venv
+__pycache__
+*.pyc
+*.sqlite3
+.git
+*.zip
+
+.env
+backups/
+docs/
+*.db
+*.sqlite3-*
+*.key
+*.pem
+node_modules/
+.openai/
