@@ -107,7 +107,11 @@ class RecoveryBundleTests(UnitTestCase):
         live = self.root / 'sources'
         with sqlite3.connect(live / 'station1/db.sqlite3') as db:
             db.execute('INSERT INTO pump_shift VALUES (99)')
+        ownership={station:(live/station/'db.sqlite3').stat() for station in ('station1','station2')}
         apply(stage, live)
+        for station, before_stat in ownership.items():
+            restored=(live/station/'db.sqlite3').stat()
+            self.assertEqual((restored.st_uid,restored.st_gid),(before_stat.st_uid,before_stat.st_gid))
         with sqlite3.connect(live / 'station1/db.sqlite3') as db:
             self.assertEqual(db.execute('SELECT id FROM pump_shift').fetchall(), [(1,)])
         self.assertEqual((live / 'station2/media/invoice.txt').read_text(), 'station2')

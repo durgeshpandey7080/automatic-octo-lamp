@@ -7,12 +7,12 @@ permissions:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       PUMP_DB_PATH: /tmp/pump-ci.sqlite3
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
           cache: pip
@@ -25,7 +25,7 @@ jobs:
       - run: node --check pump/static/pump/owner.js
 
   synthetic-lab:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         station: [station1, station2]
@@ -35,8 +35,8 @@ jobs:
       PUMP_DB_PATH: /tmp/synthetic.sqlite3
       STATION_CODE: ${{ matrix.station }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
           cache: pip

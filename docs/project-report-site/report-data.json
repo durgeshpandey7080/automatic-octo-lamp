@@ -1,7 +1,7 @@
 {
   "title": "Pandey Petrol Pump — Project Report",
   "snapshotDate": "23 Oct 2026",
-  "tests": 166,
+  "tests": 168,
   "triggersPerStation": 96,
   "migration": "0033",
   "verification": [
@@ -20,7 +20,8 @@
     "Combined owner summary: both service directions, owner-only access, expiring signed requests, date/settlement cutoffs, missing-service handling and no ledger writes",
     "Local AI: allowed check IDs only, no free-form factual claims, owner-only access, no cloud fallback, isolated container, timeout/concurrency, input minimisation and escaped output",
     "Owner phone redesign: matching-shift weekly comparisons, missing/zero baselines, sparse stock history, configurable thresholds, dip freshness, reading grace deadlines and login routing",
-    "Dev-only isolation: both synthetic stations reconciled; 166 Django regressions and 5 release-manifest checks passed; main/tag protections configured"
+    "Dev-only isolation: both synthetic stations reconciled; 166 Django regressions and 5 release-manifest checks passed; main/tag protections configured",
+    "CI-discovered restore ownership assumption fixed; 168 full regressions and 9 backup/ownership tests under UID/GID 1001 pass locally"
   ],
   "roadmap": [
     {

@@ -20,7 +20,7 @@
       "status": "in_progress",
       "evidence": [
         "docs/DEV_CHECKPOINT.md: main PR/check protection and immutable version-tag rules verified.",
-        "166 local Django tests, 5 release-manifest tests and both-station synthetic rehearsals passed."
+        "168 local Django tests, 5 release-manifest tests and both-station synthetic rehearsals passed."
       ],
       "remaining": "Verify hosted CI for the current dev commit; no release tag exists."
     },

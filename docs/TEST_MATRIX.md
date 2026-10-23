@@ -1,6 +1,6 @@
 # Synthetic acceptance matrix
 
-Baseline: 155 tests passed at commit 59f40aa. Current local development checkpoint: 166 Django tests, 5 release-manifest tests and both synthetic station rehearsals passed. This matrix is coverage planning, not a claim that every scenario below passes.
+Baseline: 155 tests passed at commit 59f40aa. Current local development checkpoint: 168 Django tests, 5 release-manifest tests and both synthetic station rehearsals passed. This matrix is coverage planning, not a claim that every scenario below passes.
 
 | Area | Required cases | Evidence/status |
 | --- | --- | --- |
