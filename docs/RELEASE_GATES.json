@@ -17,12 +17,13 @@
   "gates": [
     {
       "id": "G0",
-      "status": "in_progress",
+      "status": "passed",
       "evidence": [
         "docs/DEV_CHECKPOINT.md: main PR/check protection and immutable version-tag rules verified.",
-        "168 local Django tests, 5 release-manifest tests and both-station synthetic rehearsals passed."
+        "168 local Django tests, 5 release-manifest tests and both-station synthetic rehearsals passed.",
+        "https://github.com/durgeshpandey7080/automatic-octo-lamp/actions/runs/39977920913"
       ],
-      "remaining": "Verify hosted CI for the current dev commit; no release tag exists."
+      "remaining": "Revalidate all required checks for every future candidate."
     },
     {
       "id": "G1",
@@ -70,5 +71,6 @@
       ],
       "remaining": "Domain/TLS, production configuration, staging and restore drill, approved openings and cutover acceptance remain pending."
     }
-  ]
+  ],
+  "validatedCodeCommit": "78bfa27fd56b6ea0f383cd6188b7f5a980d02da4"
 }

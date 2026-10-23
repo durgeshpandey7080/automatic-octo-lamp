@@ -10,6 +10,8 @@
 
 New code includes fail-closed synthetic seeding, production refusal of demo commands, isolated lab automation, shared Indian business-clock boundaries and release-manifest validation. Automatic business-date changes and audited shift submissions remain future application work.
 
-Still required: hosted CI results, exact stricter recovery targets, domain/DNS and backup/standby budget; audited shift/cash workflows; ten-user contention tests; actual production configuration, fresh-host recovery and owner UAT. All production gates remain unpassed until the corresponding evidence is recorded.
+Still required: exact stricter recovery targets, domain/DNS and backup/standby budget; audited shift/cash workflows; ten-user contention tests; actual production configuration, fresh-host recovery and owner UAT. Only G0 has passed; G1 through G7 remain unpassed until their evidence is recorded.
 
-Hosted CI first exposed a hardcoded restore UID assumption. Recovery now preserves the installed database owner and permissions; required ownership-change errors still fail recovery. The complete 168-test suite passes, and 9 backup/ownership tests also pass as UID/GID 1001. CI uses Ubuntu 24.04 and verified, pinned v6 action commits. Hosted CI must confirm the corrected checkpoint before G0 is complete.
+Hosted CI first exposed a hardcoded restore UID assumption. Recovery now preserves the installed database owner and permissions; required ownership-change errors still fail recovery. The complete 168-test suite passes, and 9 backup/ownership tests also pass as UID/GID 1001. CI uses Ubuntu 24.04 and verified, pinned v6 action commits. Hosted CI passed all three jobs for code checkpoint 78bfa27; G0 is complete for this checkpoint.
+
+Hosted CI evidence: https://github.com/durgeshpandey7080/automatic-octo-lamp/actions/runs/39977920913 . Future changes require their own CI results; this is not production acceptance.
