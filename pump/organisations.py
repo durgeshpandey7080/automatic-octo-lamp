@@ -12,7 +12,7 @@ from django.views.decorators.http import require_POST
 
 class PortalLoginView(LoginView):
     def get_success_url(self):
-        return '/organisations/'
+        return '/owner/' if self.request.user.is_superuser else '/organisations/'
 
 class PortalMiddleware:
     def __init__(self, get_response):

@@ -32,7 +32,7 @@ def dashboard_graphics(end):
         ratio=(stock['expected']/tank.capacity_litres*100) if stock else None
         tanks.append({'tank':tank,'stock':stock,'percent':ratio,
             'fill':min(Decimal('100'),max(ZERO,ratio)) if ratio is not None else ZERO,
-            'low':ratio is not None and ratio<=20})
+            'low':stock is not None and stock['expected']<=tank.low_stock_litres})
     return {'graph_days':list(days.values()),'volume_max':volume_max,'revenue_max':revenue_max,
         'has_graph_data':any(d['shifts'] for d in days.values()),
         'graph_start':start,'graph_end':end,'collection_parts':collections,'collected_total':collected,

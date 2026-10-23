@@ -27,8 +27,13 @@ class OrganisationLoginTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_superuser('owner', password='test-password-only')
 
-    def test_login_goes_to_organisation_chooser(self):
+    def test_owner_login_goes_to_owner_dashboard(self):
         response = self.client.post('/login/?next=/', {'username':'owner', 'password':'test-password-only'})
+        self.assertRedirects(response, '/owner/', fetch_redirect_response=False)
+
+    def test_manager_login_keeps_organisation_chooser(self):
+        get_user_model().objects.create_user('station-manager', password='test-password-only', is_staff=True)
+        response=self.client.post('/login/', {'username':'station-manager', 'password':'test-password-only'})
         self.assertRedirects(response, '/organisations/')
 
     @override_settings(STATION_LINKS=[{'code':'station1','name':'Hamara Pump Narai','url':'http://127.0.0.1:8000/'},

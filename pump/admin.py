@@ -6,7 +6,7 @@ admin.site.site_title = settings.STATION_NAME
 admin.site.index_title = 'Station administration'
 @admin.register(Tank)
 class TankAdmin(admin.ModelAdmin):
-    list_display = ['name', 'fuel', 'capacity_litres']
+    list_display = ['name', 'fuel', 'capacity_litres', 'low_stock_litres']
     def get_readonly_fields(self, request, obj=None):
         return ['fuel'] if obj and (Reading.objects.filter(nozzle__tank=obj).exists() or obj.nozzle_set.filter(dutyassignment__isnull=False).exists()) else []
 @admin.register(Salesperson)

@@ -108,7 +108,7 @@ class OwnerDashboardTests(TestCase):
         response.read.return_value=json.dumps(result).encode()
         self.assertEqual(peer_summary(self.day,self.owner)['code'],'station2')
         self.assertEqual(opener.return_value.open.call_args.kwargs['timeout'],3)
-        for key,value in [('code','station1'),('as_of','2000-01-01'),('schema',2)]:
+        for key,value in [('code','station1'),('as_of','2000-01-01'),('schema',3)]:
             bad=copy.deepcopy(result);bad[key]=value;response.read.return_value=json.dumps(bad).encode()
             with self.assertRaises(ValueError):peer_summary(self.day,self.owner)
         bad=copy.deepcopy(result);bad['metrics']['cash']='NaN';response.read.return_value=json.dumps(bad).encode()
@@ -139,3 +139,87 @@ class OwnerDashboardTests(TestCase):
         s=station_summary(self.day)
         self.assertEqual(s['unallocated_bank_count'],0)
         self.assertEqual(D(s['metrics']['bank']),2098)
+
+    def baseline_readings(self, day, number=1, multiplier=D('0.5')):
+        shift=Shift.objects.create(date=day,number=number)
+        for reading in self.shift.readings.all():
+            Reading.objects.create(shift=shift,nozzle=reading.nozzle,salesperson=self.person,
+                opening_litres=100,closing_litres=110,unit_price=reading.unit_price*multiplier)
+        return shift
+
+    def test_comparison_matches_only_complete_priced_shift_slots(self):
+        from .owner_insights import decorate
+        baseline=self.baseline_readings(self.day-timedelta(days=7))
+        summary=decorate(station_summary(self.day),self.day)
+        self.assertEqual(summary['view']['percent'],100)
+        self.assertEqual(summary['view']['matched_slots'],[1])
+        baseline.readings.first().delete()
+        self.assertFalse(decorate(station_summary(self.day),self.day)['view']['compare_available'])
+
+    def test_zero_baseline_and_empty_day_do_not_imply_a_change(self):
+        from .owner_insights import decorate
+        baseline=self.baseline_readings(self.day-timedelta(days=7))
+        baseline.readings.update(closing_litres=100)
+        self.assertFalse(decorate(station_summary(self.day),self.day)['view']['compare_available'])
+        empty=decorate(station_summary(self.day-timedelta(days=1)),self.day-timedelta(days=1))
+        self.assertFalse(empty['view']['has_sales'])
+
+    @patch('pump.owner_dashboard.peer_summary')
+    def test_empty_day_displays_missing_data_and_missing_cash_opening(self,peer):
+        empty_day=self.day-timedelta(days=1)
+        peer.return_value=station_summary(empty_day)
+        self.client.force_login(self.owner)
+        response=self.client.get('/owner/?date='+str(empty_day))
+        self.assertContains(response,'Your day is taking shape.')
+        self.assertFalse(response.context['has_sales'])
+        self.assertFalse(response.context['cash_ready'])
+        self.assertContains(response,'Missing entries are not zero sales.')
+
+    def test_grace_period_is_for_readings_not_approval(self):
+        from datetime import datetime
+        from .owner_insights import decorate
+        at=lambda hour,minute:timezone.make_aware(datetime.combine(self.day,datetime.min.time()).replace(hour=hour,minute=minute))
+        before=decorate(station_summary(self.day),self.day,now=at(22,30))
+        self.assertFalse(before['sale_slots'][1]['overdue'])
+        after=decorate(station_summary(self.day),self.day,now=at(22,31))
+        self.assertTrue(after['sale_slots'][1]['overdue'])
+        self.assertTrue(after['sale_slots'][0]['ready'])
+
+    def test_stock_threshold_dip_freshness_and_sparse_history(self):
+        from .owner_insights import decorate
+        tank=Tank.objects.get(fuel='PETROL')
+        TankOpening.objects.create(tank=tank,date=self.day-timedelta(days=10),litres=4500,recorded_by=self.owner)
+        closing=Shift.objects.create(date=self.day,number=2)
+        TankDip.objects.create(tank=tank,shift=closing,physical_litres=4450,expected_litres=4460,recorded_by=self.owner)
+        row=next(r for r in decorate(station_summary(self.day),self.day)['stocks'] if r['fuel']=='PETROL')
+        self.assertTrue(row['low']);self.assertEqual(row['threshold'],'5000.000')
+        self.assertFalse(row['dip_stale']);self.assertEqual(D(row['dip_variance']),-10)
+        self.assertIsNone(row['coverage'])
+        tank.low_stock_litres=4000;tank.save()
+        row=next(r for r in decorate(station_summary(self.day+timedelta(days=1)),self.day+timedelta(days=1))['stocks'] if r['fuel']=='PETROL')
+        self.assertFalse(row['low']);self.assertTrue(row['dip_stale'])
+
+    def test_peer_rejects_nonfinite_stock_and_incomplete_slot_details(self):
+        from .owner_dashboard import validate_details
+        result=self.remote();result['stocks'][0]['capacity']='NaN'
+        with self.assertRaises(ValueError):validate_details(result)
+        result=self.remote();result['sale_slots'][0]['count']=9
+        with self.assertRaises(ValueError):validate_details(result)
+
+    def test_indian_currency_grouping_and_nonfinite_values(self):
+        from .templatetags.owner_format import inr
+        self.assertEqual(inr('1234567.80'),'12,34,567.80')
+        self.assertEqual(inr('-1234'),'−1,234.00')
+        self.assertEqual(inr('NaN'),'—')
+
+    def test_stock_coverage_excludes_missing_days_and_warns_under_one_day(self):
+        from .owner_insights import decorate
+        tank=Tank.objects.get(fuel='PETROL')
+        TankOpening.objects.create(tank=tank,date=self.day-timedelta(days=7),litres=300,recorded_by=self.owner)
+        for offset in (1,3,5):
+            for number in (1,2):self.baseline_readings(self.day-timedelta(days=offset),number=number)
+        row=next(r for r in decorate(station_summary(self.day),self.day)['stocks'] if r['fuel']=='PETROL')
+        # 3 complete days consume 80 L/day; current shift consumes 40 L: 20 L remain.
+        self.assertEqual(row['history_days'],3)
+        self.assertEqual(D(row['coverage']),D('0.25'))
+        self.assertTrue(row['urgent'])

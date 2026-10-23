@@ -1,6 +1,6 @@
 # Owner dashboard implementation plan
 
-Source inspection: 23 October 2026. This is a planning checkpoint; no application behavior changed in this documentation update.
+Initial source inspection: 23 October 2026. This plan records the discovery checkpoint. See `REDESIGN_STATUS.md` for the first implemented dashboard and the backend features still outstanding.
 
 ## First phone screen
 

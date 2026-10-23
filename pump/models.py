@@ -15,6 +15,8 @@ class Tank(models.Model):
     fuel = models.CharField(max_length=10, choices=[('PETROL', 'Petrol'), ('DIESEL', 'Diesel')])
     capacity_litres = models.DecimalField(max_digits=12, decimal_places=3,
         validators=[MinValueValidator(Decimal('0.001'))])
+    low_stock_litres = models.DecimalField(max_digits=12, decimal_places=3, default=Decimal('5000'),
+        validators=[MinValueValidator(Decimal('0'))], verbose_name='Low stock warning (litres)')
     def __str__(self):
         return f'{self.name} ({self.get_fuel_display()})'
 

@@ -1,6 +1,6 @@
 """Read-only owner summaries across separate station services. No database sharing."""
 import json
-from datetime import date
+from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from urllib.request import Request, build_opener, ProxyHandler, HTTPRedirectHandler
 from urllib.error import URLError
@@ -20,9 +20,10 @@ from . import models as m
 from .reports import daily_report
 from .money_book import statement, bank_sources
 from .debtor_ageing import ageing
+from .owner_insights import sales_slots, stock_details, decorate
 
 ZERO=Decimal('0.00')
-METRICS=['net_sales','petrol_litres','diesel_litres','lube_sales','other_income','discounts','cash','bank','debtor_balance','debt_over_30','supplier_balance','pending_digital','shortage_balance']
+METRICS=['fuel_sales','net_sales','petrol_litres','diesel_litres','lube_sales','other_income','discounts','cash','bank','debtor_balance','debt_over_30','supplier_balance','pending_digital','shortage_balance']
 COUNTS=['pending_digital_count','unallocated_bank_count']
 SALT='owner-summary-v1'
 
@@ -51,13 +52,14 @@ def station_summary(as_of):
     closed=m.BusinessDayClose.objects.filter(date=as_of).first()
     latest_close=m.BusinessDayClose.objects.filter(date__lte=as_of,status='CLOSED').order_by('-date').values_list('date',flat=True).first()
     values=dict(net_sales=report['net_sales'],petrol_litres=report['fuel']['PETROL']['litres'],diesel_litres=report['fuel']['DIESEL']['litres'],lube_sales=report['lube_total'],other_income=report['income_total'],discounts=report['discount_total'],cash=balances['CASH'],bank=balances['BANK'],debtor_balance=debt['total_balance'],debt_over_30=sum(debt['age_totals'][1:],ZERO),supplier_balance=supplier,pending_digital=sum((r.amount for r in pending),ZERO),shortage_balance=shortage)
+    values['fuel_sales'] = sum((f['amount'] for f in report['fuel'].values()), ZERO)
     warnings=[]
     for kind in ['CASH','BANK']:
         if not any(a.kind==kind for a in accounts):warnings.append(kind.title()+' opening account is missing at this date; balance is not established.')
     if not report['complete']:warnings.append('Selected day is incomplete: two shifts, 16 readings and all handovers are required.')
     if report['partial_prices']:warnings.append('Some readings have no saved rate; sales amount is incomplete.')
     if any(b<0 for b in balances.values()):warnings.append('A recorded money balance is negative. Review the station ledger.')
-    return dict(schema=1,code=settings.STATION_CODE,name=settings.STATION_NAME,as_of=as_of.isoformat(),checked_at=timezone.localtime().isoformat(),metrics={k:str(v) for k,v in values.items()},pending_digital_count=len(pending),unallocated_bank_count=sum(1 for r in bank_sources(as_of) if not r['allocation']),shifts=report['shifts_count'],readings=report['readings_count'],complete=report['complete'],warnings=warnings,latest_sale_date=latest.isoformat() if latest else None,close_status=closed.status if closed else 'NOT STARTED',latest_closed_date=latest_close.isoformat() if latest_close else None,stocks=[{'name':str(r['tank']),'fuel':r['tank'].fuel,'litres':str(r['stock']['expected']) if r['stock'] else None,'warning':r['stock']['warning'] if r['stock'] else True} for r in report['stocks']],cash_ready=any(a.kind=='CASH' for a in accounts),bank_ready=any(a.kind=='BANK' for a in accounts))
+    return dict(schema=2,code=settings.STATION_CODE,name=settings.STATION_NAME,as_of=as_of.isoformat(),checked_at=timezone.localtime().isoformat(),metrics={k:str(v) for k,v in values.items()},pending_digital_count=len(pending),unallocated_bank_count=sum(1 for r in bank_sources(as_of) if not r['allocation']),shifts=report['shifts_count'],readings=report['readings_count'],complete=report['complete'],warnings=warnings,latest_sale_date=latest.isoformat() if latest else None,close_status=closed.status if closed else 'NOT STARTED',latest_closed_date=latest_close.isoformat() if latest_close else None,stocks=stock_details(report, as_of),sale_slots=sales_slots(as_of),baseline_slots=sales_slots(as_of-timedelta(days=7)),cash_ready=any(a.kind=='CASH' for a in accounts),bank_ready=any(a.kind=='BANK' for a in accounts))
 
 
 @require_GET
@@ -88,7 +90,7 @@ def peer_summary(as_of,user):
         if len(raw)>262144:raise ValueError('Summary response too large.')
         result=json.loads(raw)
     if not isinstance(result,dict) or not isinstance(result.get('metrics'),dict):raise ValueError('Invalid station summary.')
-    if result.get('schema')!=1 or result.get('code')!=target or result.get('as_of')!=as_of.isoformat():raise ValueError('Unexpected station summary.')
+    if result.get('schema')!=2 or result.get('code')!=target or result.get('as_of')!=as_of.isoformat():raise ValueError('Unexpected station summary. Update both station services together.')
     # Validate amounts before displaying or combining a peer response.
     for k in METRICS:
         number=Decimal(result['metrics'][k])
@@ -98,7 +100,34 @@ def peer_summary(as_of,user):
     if type(result['warnings']) is not list or type(result['stocks']) is not list:raise ValueError('Invalid station summary.')
     for key in ['name','checked_at','shifts','readings','complete','close_status','latest_sale_date','latest_closed_date','cash_ready','bank_ready']:
         if key not in result:raise ValueError('Incomplete station summary.')
+    validate_details(result)
     return result
+
+
+def validate_details(result):
+    def number(value):
+        if not isinstance(value, str): raise ValueError('Invalid numeric detail.')
+        amount = Decimal(value)
+        if not amount.is_finite() or abs(amount) > Decimal('1e25'): raise ValueError('Invalid numeric detail.')
+        return amount
+    checked = datetime.fromisoformat(result['checked_at'])
+    if checked.tzinfo is None: raise ValueError('Missing summary timezone.')
+    for key in ('sale_slots', 'baseline_slots'):
+        slots = result[key]
+        if not isinstance(slots, list) or len(slots) != 2: raise ValueError('Invalid shift details.')
+        if [s['number'] for s in slots] != [1, 2]: raise ValueError('Invalid shift slots.')
+        for slot in slots:
+            if type(slot['count']) is not int or not 0 <= slot['count'] <= 8 or type(slot['priced']) is not bool:
+                raise ValueError('Invalid reading coverage.')
+            for field in ('fuel_sales', 'petrol', 'diesel'):
+                if number(slot[field]) < 0: raise ValueError('Negative sales detail.')
+    for tank in result['stocks']:
+        if number(tank['capacity']) <= 0 or number(tank['threshold']) < 0: raise ValueError('Invalid stock setup.')
+        for field in ('litres', 'dip_litres', 'dip_variance', 'coverage'):
+            if tank[field] is not None: number(tank[field])
+        if tank['dip_date'] is not None and date.fromisoformat(tank['dip_date']) > date.fromisoformat(result['as_of']):
+            raise ValueError('Future dip detail.')
+        if type(tank['history_days']) is not int or not 0 <= tank['history_days'] <= 7: raise ValueError('Invalid stock history.')
 
 
 @login_required
@@ -107,7 +136,7 @@ def peer_summary(as_of,user):
 def dashboard(request):
     if not request.user.is_superuser:raise PermissionDenied
     form=AgeDateForm(request.GET or {'date':timezone.localdate()})
-    context={'page_name':'Owner dashboard','form':form}
+    context={'page_name':'Owner dashboard','form':form,'today':timezone.localdate()}
     if not form.is_valid():return render(request,'pump/owner_dashboard.html',context,status=400)
     as_of=form.cleaned_data['date'];context['as_of']=as_of
     summaries={};errors={}
@@ -117,12 +146,28 @@ def dashboard(request):
     try:summaries[target]=peer_summary(as_of,request.user)
     except (URLError,TimeoutError,OSError,ValueError,KeyError,TypeError,InvalidOperation):errors[target]='Station summary is unavailable or owner access was not accepted. Retry after checking the station service and owner account.'
     names={s['code']:s['name'] for s in settings.STATION_LINKS}
+    for summary in summaries.values(): decorate(summary, as_of)
     context['stations']=[{'code':code,'name':names.get(code,code),'data':summaries.get(code),'error':errors.get(code)} for code in ['station1','station2']]
+    context['comparison_date'] = as_of-timedelta(days=7)
+    context['previous_date'] = as_of-timedelta(days=1)
+    context['next_date'] = as_of+timedelta(days=1) if as_of < timezone.localdate() else None
+    context['review_count'] = sum(sum(slot['overdue'] for slot in s['sale_slots']) +
+        int(s['close_status'] in {'SUBMITTED', 'REVIEWED'}) + sum(t['low'] or t['warning'] or t['urgent'] or t['threshold_invalid'] for t in s['stocks'])
+        for s in summaries.values()) + len(errors)
     if len(summaries)==2:
         totals={k:sum((Decimal(s['metrics'][k]) for s in summaries.values()),ZERO) for k in METRICS}
         totals.update({k:sum(s[k] for s in summaries.values()) for k in COUNTS})
         context['totals']=totals
         context['money_ready']=all(s['cash_ready'] and s['bank_ready'] for s in summaries.values())
         context['sales_complete']=all(s['complete'] for s in summaries.values())
+        context['cash_ready']=all(s['cash_ready'] for s in summaries.values())
+        context['has_sales']=any(s['view']['has_sales'] for s in summaries.values())
+        context['both_have_sales']=all(s['view']['has_sales'] for s in summaries.values())
+        context['priced']=all(s['view']['priced'] for s in summaries.values())
+        views=[s['view'] for s in summaries.values()]
+        if all(v['compare_available'] for v in views):
+            baseline=sum((v['comparison_previous'] for v in views),ZERO)
+            change=(sum((v['comparison_current'] for v in views),ZERO)-baseline)/baseline*100
+            context['comparison']={'percent':abs(change),'up':change>=0,'previous':baseline}
     response=render(request,'pump/owner_dashboard.html',context,status=200 if not errors else 503)
     return response

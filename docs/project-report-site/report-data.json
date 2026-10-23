@@ -1,9 +1,9 @@
 {
   "title": "Pandey Petrol Pump — Project Report",
-  "snapshotDate": "22 Oct 2026",
-  "tests": 146,
+  "snapshotDate": "23 Oct 2026",
+  "tests": 155,
   "triggersPerStation": 96,
-  "migration": "0032",
+  "migration": "0033",
   "verification": [
     "Closed-day transitions, stale reviews and reasoned owner exceptions",
     "SQLite bulk-update, deletion and backdated-entry locks",
@@ -18,7 +18,8 @@
     "Staff advances, partial salary clearing, reversals, duplicate references and paid-salary caps",
     "Shortage receipt before/after payroll, waiver limits, retries, correction limits, cash/bank posting and closed dates",
     "Combined owner summary: both service directions, owner-only access, expiring signed requests, date/settlement cutoffs, missing-service handling and no ledger writes",
-    "Local AI: allowed check IDs only, no free-form factual claims, owner-only access, no cloud fallback, isolated container, timeout/concurrency, input minimisation and escaped output"
+    "Local AI: allowed check IDs only, no free-form factual claims, owner-only access, no cloud fallback, isolated container, timeout/concurrency, input minimisation and escaped output",
+    "Owner phone redesign: matching-shift weekly comparisons, missing/zero baselines, sparse stock history, configurable thresholds, dip freshness, reading grace deadlines and login routing"
   ],
   "roadmap": [
     {
@@ -142,15 +143,16 @@
       "priority": 9,
       "title": "Combined owner dashboard",
       "status": "implemented",
-      "summary": "Read-only combined owner dashboard across both independent station databases.",
+      "summary": "Phone-first owner dashboard with fuel sales, matching-shift weekly comparisons, recorded cash, tank warnings and a review queue.",
       "built": [
         "Date-filtered net sales plus other income, separate petrol/diesel litres and lube totals",
         "Recorded cash/bank, customer and supplier balances, estimated debt older than 30 days, pending digital settlements and unallocated bank movements",
         "Shortage balance after waivers/returns, stock balances, day completion/closing status and station drill-through",
         "Owner-only expiring signed service summaries, visible timestamps, bounded timeouts and withheld combined totals when a station is unavailable",
-        "Optional local Qwen3/Ollama ranks verified owner checks in English/Hindi, with source figures retained and no financial tools"
+        "Optional local Qwen3/Ollama ranks verified owner checks in English/Hindi, with source figures retained and no financial tools",
+        "Owner-first login and phone navigation; configurable tank warning levels, dated physical dips and coverage from complete reading days"
       ],
-      "remaining": "Custom alert rules, trends across date ranges and consolidated accountant exports remain future work. Ageing is an estimate, bank/cash are recorded balances, and each station is read independently."
+      "remaining": "Cash custody/recipient acknowledgements, physical cash counts, retained-change carry-forward, audited shift submissions/corrections, mandatory late reasons, 10 PM business-date rollover and offline synchronisation remain planned. Cash is recorded ledger balance, not physical verification."
     },
     {
       "id": "exports",
@@ -247,6 +249,12 @@
       "icon": "✓",
       "title": "On-PC priorities from verified checks",
       "body": "Local CPU model installed, cloud features disabled, internal-only network and no published AI port. The first free-form narration made factual mistakes and was rejected. The final workflow lets AI rank only validated check IDs; all factual text and amounts come from application rules. English/Hindi and current/both-station scope are supported. No cloud fallback or financial record changes. 146 tests pass."
+    },
+    {
+      "phase": "23 OCT 2026 - OWNER REDESIGN",
+      "icon": "+",
+      "title": "Sales-first dashboard for the owner phone",
+      "body": "Phone-first layout, matching-shift same-weekday comparisons, dated dips, per-tank warnings and recorded cash. 155 tests pass. Both station databases migrated to 0033 with all original records unchanged. Custody and shift-submission extensions remain planned."
     }
   ],
   "setup": [

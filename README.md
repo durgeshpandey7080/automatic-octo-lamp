@@ -6,7 +6,7 @@ This is the source checkpoint imported on **23 October 2026**, including two-sta
 
 **Start here:** [repository import and isolated verification](docs/REPOSITORY_IMPORT.md). The original setup scripts below target the existing `hpcl_pump` installation; read the import notes before running them from a second checkout. Private business data and credentials are not in this repository.
 
-**Next design work:** [owner dashboard brief](docs/DESIGN_BRIEF.md): owner first, sales first, phone first; managers close the day and admin handles shortages. The redesign has not yet been implemented. The separate progress website source is in [docs/project-report-site](docs/project-report-site).
+**Owner dashboard redesigned:** [delivery and verification](docs/REDESIGN_STATUS.md), [agreed requirements](docs/DESIGN_BRIEF.md), and [remaining implementation plan](docs/REDESIGN_PLAN.md). The first phone dashboard includes fuel sales, same-weekday comparison, cash, configurable tank warnings and a review section. Broader cash-custody and shift-submission workflows remain planned. The separate progress website source is in [docs/project-report-site](docs/project-report-site).
 
 A working starting point for one Windows computer and one operator: 8 nozzles,
 2 daily shifts, cumulative litre meter readings, daily fuel prices,
